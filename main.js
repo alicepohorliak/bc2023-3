@@ -1,12 +1,36 @@
+// підключення модуля fs
 const fs = require('fs');
 
-fs.promises.readFile('data.json', 'utf8')
-  .then((data) => JSON.parse(data))
-  .then((jsonData) => jsonData
-    .filter((x) => x.ku === '13' && parseFloat(x.value) > 5)
-    .map((x) => x.value.toString())
-    .join('\n')
-  )
-  .then((filteredData) => fs.promises.writeFile('output.txt', filteredData, 'utf8'))
-  .then(() => console.log('Дані успішно оброблені і записані у файл output.txt'))
-  .catch((error) => console.error('Помилка: ', error));
+// читання json файлу
+fs.readFile("data.json", (err, data) => {
+    if (err) {
+        console.error(err);
+        return;
+    } else {
+        try {
+
+            // фільтрування даних, 'ku' = 13, 'value' > 5
+            const jsonData = JSON.parse(data);
+            const filtered = jsonData.filter(item => item.ku == 13 && item.value > 5);
+            const forfile = filtered.map(item => item.value.toString());
+
+            // вивід шуканих значень у консоль
+            filtered.forEach(item => {
+                console.log(item.value);
+            });
+
+            // запис шуканих значень у файл output.txt
+            fs.writeFile("output.txt", forfile.join('\n'), (err) => {
+                if (err)
+                {
+                    console.error(err);
+                    return;
+                }
+            });
+
+        } catch (error) {
+            console.error('Помилка', error.message);
+        }
+
+    }
+});
